@@ -13,6 +13,10 @@ export class Share {
     @Prop()
     userShare: string;
 
+    @Prop({
+        required: true, enums: ['sharing', 'stop'], default: 'sharing'
+    })
+    status: string;
 }
 
 

@@ -6,4 +6,9 @@ export class BPostDTO {
 
     author: string;
 
+    deletedAt: Date;
+
+    deleted: true;
+
+    tag: string;
 }

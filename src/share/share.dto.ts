@@ -4,4 +4,5 @@ export class ShareDTO {
 
     userShare: string;
 
+    status: string;
 }

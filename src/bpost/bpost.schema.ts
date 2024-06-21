@@ -5,6 +5,7 @@ export type BPostDocument = HydratedDocument<BPost>;
 
 @Schema()
 export class BPost {
+
     @Prop()
     content: string;
 
@@ -14,6 +15,14 @@ export class BPost {
     @Prop()
     author: string;
 
+    @Prop()
+    deletedAt: Date;
+
+    @Prop()
+    deleted: true;
+
+    @Prop()
+    tag: string;
 }
 
 
