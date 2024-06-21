@@ -10,7 +10,7 @@ export class User {
     name: string;
 
     @Prop({ unique: true, maxlength: 50 })
-    email: string;
+    emailOrPhone: string;
 
     @Prop()
     password: string;
@@ -26,6 +26,9 @@ export class User {
 
     @Prop({ required: true, enum: ['user', 'admin'], default: 'user' })
     role: string;
+
+    @Prop({ required: true, enum: ['male', 'female', 'other'], default: 'male' })
+    sex: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

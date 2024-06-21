@@ -2,7 +2,7 @@ export class UserDTO {
 
     name: string;
 
-    email: string;
+    emailOrPhone: string;
 
     password: string;
 
@@ -12,4 +12,5 @@ export class UserDTO {
 
     bio: string;
 
+    sex: string;
 }
