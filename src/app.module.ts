@@ -9,9 +9,11 @@ import { ChatModule } from './chat/chat.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './todo/todo.module';
 import { BpostModule } from './bpost/bpost.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [UserModule, LikeModule, CommentModule, ShareModule, ChatModule, MongooseModule.forRoot('mongodb://localhost/social_media_app'), TodoModule, BpostModule],
+  imports: [UserModule, LikeModule, CommentModule, ShareModule, ChatModule, MongooseModule.forRoot('mongodb://localhost/social_media_app'), TodoModule, BpostModule,
+    JwtModule.register({ secret: 'XXKAMSKASMIWN123x' })],
   controllers: [AppController],
   providers: [AppService],
 })
