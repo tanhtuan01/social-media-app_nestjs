@@ -29,6 +29,9 @@ export class User {
 
     @Prop({ required: true, enum: ['male', 'female', 'other'], default: 'male' })
     sex: string;
+
+    @Prop()
+    dateOfBirth: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

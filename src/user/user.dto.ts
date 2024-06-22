@@ -13,4 +13,6 @@ export class UserDTO {
     bio: string;
 
     sex: string;
+
+    dateOfBirth: Date;
 }
