@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -10,11 +10,23 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './todo/todo.module';
 import { BpostModule } from './bpost/bpost.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthMiddleware } from './middleware/auth.middleware';
+import { AuthService } from './middleware/auth.service';
 
 @Module({
   imports: [UserModule, LikeModule, CommentModule, ShareModule, ChatModule, MongooseModule.forRoot('mongodb://localhost/social_media_app'), TodoModule, BpostModule,
-    JwtModule.register({ secret: 'XXKAMSKASMIWN123x' })],
+    JwtModule.register({ secret: 'XXKAMSKASMIWN123x', signOptions: { expiresIn: '1d' } }),],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthService],
+  // exports: [AuthService],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        { path: '/user/create', method: RequestMethod.POST },
+      )
+      .forRoutes('*')
+  }
+}

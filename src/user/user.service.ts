@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Model } from 'mongoose';
@@ -10,7 +10,16 @@ export class UserService {
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
     async createUser(createUserDto: UserDTO): Promise<User> {
-        return await this.userModel.create(createUserDto);
+        try {
+            return await this.userModel.create(createUserDto)
+        }
+        catch (error) {
+            throw new HttpException(
+                'INTERNAL_SERVER_ERROR',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+
     }
 
     async updateUser(userId: string, updateUserDto: UserDTO): Promise<User> {

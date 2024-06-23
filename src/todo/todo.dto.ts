@@ -6,6 +6,8 @@ export class ToDoDTO {
 
     createdAt: Date;
 
+    type: string;
+
     userId: string;
 
     status: string;
@@ -17,4 +19,8 @@ export class ToDoDTO {
     deleted: boolean;
 
     deletedAt: Date;
+
+    note: string;
+
+    taskPriority: string;
 }

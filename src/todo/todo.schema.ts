@@ -18,7 +18,10 @@ export class ToDo {
     @Prop({ required: true })
     userId: string;
 
-    @Prop({ required: true, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' })
+    @Prop({ required: true, enum: ['Personal', 'Work', 'Family', 'Study', 'Healthy', 'Entertainment', 'Finance', 'Home'], default: 'Personal' })
+    type: string;
+
+    @Prop({ required: true, enum: ['pending', 'inprogress', 'completed'], default: 'pending' })
     status: string;
 
     @Prop({ required: true })
@@ -32,6 +35,12 @@ export class ToDo {
 
     @Prop()
     deletedAt: Date;
+
+    @Prop({ default: '' })
+    note: string;
+
+    @Prop({ required: true, default: 'Normal', enum: ['Important', 'Normal'] })
+    taskPriority: string;
 }
 
 
