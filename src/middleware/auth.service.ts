@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
-const secret = process.env.JWT_SECRET;
 
 @Injectable()
 export class AuthService {

@@ -23,4 +23,9 @@ export class UserController {
 
     }
 
+    @Get('get/:emailOrPhone/:password')
+    getUser(@Param('emailOrPhone') emailOrPhone: string, @Param('password') password: string) {
+        return this.userService.getUser(emailOrPhone, password)
+    }
+
 }
