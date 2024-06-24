@@ -21,7 +21,7 @@ export class ToDo {
     @Prop({ required: true, enum: ['Personal', 'Work', 'Family', 'Study', 'Healthy', 'Entertainment', 'Finance', 'Home'], default: 'Personal' })
     type: string;
 
-    @Prop({ required: true, enum: ['pending', 'inprogress', 'completed'], default: 'pending' })
+    @Prop({ required: true, enum: ['Pending', 'Inprogress', 'Completed'], default: 'Pending' })
     status: string;
 
     @Prop({ required: true })

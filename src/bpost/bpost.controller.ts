@@ -1,16 +1,23 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { BpostService } from './bpost.service';
 import { BPostDTO } from './bpost.dto';
 import { BPost } from './bpost.schema';
+import { Request } from 'express';
 
-@Controller('bpost')
+@Controller('post')
 export class BpostController {
 
     constructor(private readonly bpostService: BpostService) { }
 
     @Post('create')
-    createPost(@Body() postDTO: BPostDTO): Promise<BPost> {
-        return this.bpostService.createPost(postDTO);
+    createPost(@Body() postDTO: BPostDTO, @Req() req: Request): Promise<BPost> {
+        const userId = req.userId;
+        return this.bpostService.createPost(userId, postDTO);
+    }
+
+    @Get('list')
+    async getAllPost(): Promise<BPost[]> {
+        return await this.bpostService.getAllPost();
     }
 
     @Put('update/:post_id')

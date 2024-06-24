@@ -32,7 +32,7 @@ export class TodoService {
 
     async getAllTodoByUserId(userId: string): Promise<ToDo[]> {
         try {
-            return await this.todoModel.find({ userId: userId }).lean().exec()
+            return await this.todoModel.find({ userId: userId, deleted: false }).lean().exec()
         } catch (error) {
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -71,12 +71,15 @@ export class TodoService {
     async softDeleteTodo(todo_id: string, user_id: string): Promise<ToDo> {
         try {
             const findTodo = await this.todoModel.findOne({ _id: todo_id, userId: user_id })
+            console.log(findTodo)
+
             if (!findTodo) throw new HttpException('Todo not found or not belong to user', HttpStatus.NOT_FOUND)
             findTodo.deleted = true
             findTodo.deletedAt = new Date()
             const softDeleteTodo = await findTodo.save()
             return softDeleteTodo
         } catch (error) {
+            console.log(error)
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }

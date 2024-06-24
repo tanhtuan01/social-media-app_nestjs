@@ -3,11 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { BPost } from './bpost.schema';
 import { Model } from 'mongoose';
 import { BPostDTO } from './bpost.dto';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.schema';
 
 @Injectable()
 export class BpostService {
 
-    constructor(@InjectModel(BPost.name) private readonly bpostModel: Model<BPost>) { }
+    constructor(@InjectModel(BPost.name) private readonly bpostModel: Model<BPost>,
+        @InjectModel(User.name) private readonly userModel: Model<User>
+    ) { }
 
     async findAllPostNotherUser(user_id: string): Promise<BPost[]> {
         try {
@@ -19,6 +23,31 @@ export class BpostService {
         }
 
     }
+
+    // async getAllPost(): Promise<BPost[]> {
+    //     try {
+    //         return await this.bpostModel.find().lean().exec();
+    //     } catch (error) {
+    //         throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
+    //     }
+    // }
+
+    async getAllPost(): Promise<(BPost & { name: string })[]> {
+        try {
+            const posts = await this.bpostModel.find().lean().exec();
+            const postsWithUserName = await Promise.all(
+                posts.map(async (post) => {
+                    const user = await this.userModel.findOne({ _id: post.author }).lean().exec();
+                    return { ...post, name: user.name || 'Unknown' };
+                })
+            );
+            return postsWithUserName;
+        } catch (error) {
+            throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     async findAllPostOfUser(user_id: string): Promise<BPost[]> {
         try {
@@ -41,8 +70,9 @@ export class BpostService {
         }
     }
 
-    async createPost(postDTO: BPostDTO): Promise<BPost> {
+    async createPost(userId: string, postDTO: BPostDTO): Promise<BPost> {
         try {
+            postDTO.author = userId;
             return await new this.bpostModel(postDTO).save();
         } catch (error) {
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);

@@ -3,9 +3,14 @@ import { BpostController } from './bpost.controller';
 import { BpostService } from './bpost.service';
 import { BPost, BPostSchema } from './bpost.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UserModule } from 'src/user/user.module';
+import { User, UserSchema } from 'src/user/user.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: BPost.name, schema: BPostSchema }])],
+  imports: [MongooseModule.forFeature([
+    { name: BPost.name, schema: BPostSchema },
+    { name: User.name, schema: UserSchema }
+  ]), UserModule],
   controllers: [BpostController],
   providers: [BpostService],
   exports: [BpostService, MongooseModule.forFeature([{ name: BPost.name, schema: BPostSchema }])]

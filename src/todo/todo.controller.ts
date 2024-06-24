@@ -22,9 +22,10 @@ export class TodoController {
         return this.todoService.getAllTodoByUserId(userId);
     }
 
-    @Delete('soft-delete/:id/:userId')
-    deleteTodo(@Param('id') id: string, @Param('userId') userId: string) {
-        return this.todoService.softDeleteTodo(id, userId);
+    @Delete('soft-delete/:id')
+    async deleteTodo(@Param('id') id: string, @Req() req: Request) {
+        const userId = req.userId;
+        return await this.todoService.softDeleteTodo(id, userId);
     }
 
     @Put('update/:id')
@@ -47,5 +48,6 @@ export class TodoController {
     restoreTodo(@Param('id') id: string, @Param('userId') userId: string): Promise<ToDo> {
         return this.todoService.restoreTodo(id, userId);
     }
+
 
 }
