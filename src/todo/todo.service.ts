@@ -1,26 +1,41 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ToDo } from './todo.schema';
 import { Model } from 'mongoose';
 import { ToDoDTO } from './todo.dto';
+import { AuthService } from 'src/middleware/auth.service';
 
 @Injectable()
 export class TodoService {
+
     constructor(
-        @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>
+        @InjectModel(ToDo.name) private readonly todoModel: Model<ToDo>,
+        private authService: AuthService
     ) { }
 
 
-    async createTodo(todoDTO: ToDoDTO): Promise<ToDo> {
+    async createTodo(userId: string, todoDTO: ToDoDTO): Promise<ToDo> {
+
         try {
+            todoDTO.userId = userId
+            console.log("TODO DTO", todoDTO)
             return await this.todoModel.create(todoDTO);
         } catch (error) {
+            console.error('ERROR create: ' + error)
             throw new HttpException(
                 'INTERNAL_SERVER_ERROR',
                 HttpStatus.INTERNAL_SERVER_ERROR
             )
         }
 
+    }
+
+    async getAllTodoByUserId(userId: string): Promise<ToDo[]> {
+        try {
+            return await this.todoModel.find({ userId: userId }).lean().exec()
+        } catch (error) {
+            throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     async getTodo(todo_id: string, user_id: string): Promise<ToDo> {

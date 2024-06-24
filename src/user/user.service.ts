@@ -4,6 +4,7 @@ import { User } from './user.schema';
 import { Model } from 'mongoose';
 import { UserDTO } from './user.dto';
 import { PasswordService } from 'src/middleware/password.service';
+import { AuthService } from 'src/middleware/auth.service';
 
 
 
@@ -11,7 +12,8 @@ import { PasswordService } from 'src/middleware/password.service';
 export class UserService {
 
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>,
-        private passwordService: PasswordService) { }
+        private passwordService: PasswordService,
+        private authService: AuthService) { }
 
 
     async createUser(createUserDto: UserDTO): Promise<User> {
@@ -56,8 +58,8 @@ export class UserService {
     }
 
 
-    async getUser(emailOrPhone: string, password: string): Promise<User> {
-
+    async getUser(emailOrPhone: string, password: string): Promise<Object> {
+        console.log('call token function')
         try {
             const findUser = await this.userModel.findOne({ emailOrPhone: emailOrPhone }).lean().exec();
 
@@ -66,8 +68,10 @@ export class UserService {
             const comparePassword = await this.passwordService.comparePasswords(password, findUser.password);
 
             if (!comparePassword) throw new HttpException('INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED);
-            return findUser
+            const token = await this.authService.signToken(String(findUser._id))
+            return { token };
         } catch (error) {
+            console.log(error)
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

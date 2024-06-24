@@ -7,7 +7,7 @@ export type TodoDocument = HydratedDocument<ToDo>;
 export class ToDo {
 
     @Prop({ required: true })
-    title: string;
+    name: string;
 
     @Prop()
     description: string;

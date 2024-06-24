@@ -9,18 +9,18 @@ import { ChatModule } from './chat/chat.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TodoModule } from './todo/todo.module';
 import { BpostModule } from './bpost/bpost.module';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { AuthService } from './middleware/auth.service';
 import { PasswordService } from './middleware/password.service';
+import { AuthModule } from './middleware/auth.module';
 // import { PasswordService } from './middleware/password.service';
 
 @Module({
-  imports: [UserModule, LikeModule, CommentModule, ShareModule, ChatModule, MongooseModule.forRoot('mongodb://localhost/social_media_app'), TodoModule, BpostModule,
-    JwtModule.register({ secret: 'XXKAMSKASMIWN123x', signOptions: { expiresIn: '1d' } })],
+  imports: [AuthModule, UserModule, LikeModule, CommentModule, ShareModule, ChatModule, MongooseModule.forRoot('mongodb://localhost/social_media_app'), TodoModule, BpostModule],
   controllers: [AppController],
-  providers: [AppService, AuthService, PasswordService],
-  exports: [PasswordService],
+  providers: [AppService, AuthService, PasswordService, JwtService, AuthService],
+  exports: [PasswordService, JwtService, AuthService],
   //exports: [AuthService, PasswordService],
 
 })

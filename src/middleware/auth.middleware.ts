@@ -1,5 +1,4 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
-import { NextFunction } from "express";
 import { AuthService } from "./auth.service";
 
 @Injectable()
@@ -11,7 +10,6 @@ export class AuthMiddleware implements NestMiddleware {
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized', status: req.method, error: '401' });
         }
-
         try {
             const { id } = await this.authService.verifyToken(token);
             // Attach the user ID to the request object

@@ -1,6 +1,6 @@
 export class ToDoDTO {
 
-    title: string;
+    name: string;
 
     description: string;
 

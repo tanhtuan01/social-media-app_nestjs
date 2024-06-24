@@ -1,17 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { ToDoDTO } from './todo.dto';
 import { ToDo } from './todo.schema';
+import { Request } from 'express';
 
 @Controller('todo')
 export class TodoController {
 
     constructor(private readonly todoService: TodoService) { }
 
-    @Post('create/:id')
-    createTodo(@Param('id') id: string, @Body() todoDTO: ToDoDTO): Promise<ToDo> {
-        todoDTO.userId = id;
-        return this.todoService.createTodo(todoDTO);
+    @Post('create')
+    createTodo(@Body() todoDTO: ToDoDTO, @Req() req: Request): Promise<ToDo> {
+        const userId = req.userId;
+        console.log("Controller todoDTO: " + todoDTO)
+        return this.todoService.createTodo(userId, todoDTO);
+    }
+
+    @Get('list-by-user')
+    listTodoByUserId(@Req() req: Request): Promise<ToDo[]> {
+        const userId = req.userId;
+        return this.todoService.getAllTodoByUserId(userId);
     }
 
     @Delete('soft-delete/:id/:userId')
