@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Share } from './share.schema';
 import { Model } from 'mongoose';
@@ -12,9 +12,13 @@ export class ShareService {
     ) { }
 
     createShareHref(post_id: string, user_id: string): string {
-        const postFind = this.bpostModel.findOne({ _id: post_id }).lean().exec();
-        if (!postFind) throw new Error('Post not found');
-        return '/post-share/' + post_id + '/u/' + user_id;
+        try {
+            const postFind = this.bpostModel.findOne({ _id: post_id }).lean().exec();
+            if (!postFind) throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+            return '/post-share/' + post_id + '/u/' + user_id;
+        } catch (error) {
+            throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

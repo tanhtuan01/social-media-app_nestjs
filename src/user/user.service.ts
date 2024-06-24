@@ -23,7 +23,23 @@ export class UserService {
     }
 
     async updateUser(userId: string, updateUserDto: UserDTO): Promise<User> {
-        return await this.userModel.findOneAndUpdate({ _id: userId }, updateUserDto, { new: true }).exec();
+        try {
+            const userFind = await this.userModel.findOne({ _id: userId });
+            if (!userFind) {
+                throw new HttpException(
+                    'USER_NOT_FOUND',
+                    HttpStatus.NOT_FOUND,
+                );
+            } else {
+                return await this.userModel.findOneAndUpdate({ _id: userId }, updateUserDto, { new: true }).exec();
+            }
+        } catch (error) {
+            throw new HttpException(
+                'INTERNAL_SERVER_ERROR',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+
     }
 
     async listUsers(): Promise<User[]> {
