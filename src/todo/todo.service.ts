@@ -30,8 +30,19 @@ export class TodoService {
 
     }
 
+    async getTodoByUser(id: string, userId: string): Promise<ToDo> {
+        try {
+            const todo = await this.todoModel.findOne({ _id: id, userId: userId, deleted: false })
+            if (!todo) throw new HttpException('TODO_NOT_FOUND', HttpStatus.NOT_FOUND)
+            return todo
+        } catch (error) {
+            throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
     async getAllTodoByUserId(userId: string): Promise<ToDo[]> {
         try {
+            console.log('all')
             return await this.todoModel.find({ userId: userId, deleted: false }).lean().exec()
         } catch (error) {
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)
@@ -54,13 +65,13 @@ export class TodoService {
 
     }
 
-    async updateTodo(todoDTO: ToDoDTO): Promise<ToDo> {
+    async updateTodo(id: string, todoDTO: ToDoDTO, user_id: string): Promise<ToDo> {
         try {
-            const todoFind = await this.todoModel.findOne({ _id: todoDTO.userId })
+            const todoFind = await this.todoModel.findOne({ _id: id })
             if (!todoFind) {
                 throw new HttpException('TODO_NOT_FOUND', HttpStatus.NOT_FOUND)
             }
-            return await this.todoModel.findByIdAndUpdate({ _id: todoDTO.userId }, todoDTO, { new: true }).exec();
+            return await this.todoModel.findOneAndUpdate({ _id: id }, todoDTO, { new: true }).exec();
 
         } catch (error) {
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR)

@@ -6,4 +6,5 @@ export class LikeDTO {
 
     createdAt: Date;
 
+    isLiked: boolean;
 }

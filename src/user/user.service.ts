@@ -33,14 +33,49 @@ export class UserService {
 
     }
 
+    async updateUserPassword(iduser: string, password: string): Promise<User> {
+        try {
+            console.log('pass:' + password)
+            console.log(iduser)
+            const passwordHash = await this.passwordService.hashPassword(password);
+            console.log(passwordHash)
+            const user = await this.userModel.findOne({ _id: iduser }).lean().exec();
+            user.password = passwordHash
+            await this.userModel.updateOne({ _id: iduser }, user).lean().exec();
+            return user
+        } catch (error) {
+            throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async checkPassword(iduser: string, password: string): Promise<boolean> {
+        const user = await this.userModel.findOne({ _id: iduser });
+        if (!user) throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+        const comparePasword = await this.passwordService.comparePasswords(password, user.password)
+        return comparePasword
+    }
+
+    async getUserInfo(id: string): Promise<User> {
+        try {
+
+            const user = await this.userModel.findOne({ _id: id }).lean().exec();
+
+            if (!user) throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+            return user;
+        } catch (error) {
+
+            throw new HttpException(
+                'INTERNAL_SERVER_ERROR',
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
     async updateUser(userId: string, updateUserDto: UserDTO): Promise<User> {
         try {
             const userFind = await this.userModel.findOne({ _id: userId });
             if (!userFind) {
-                throw new HttpException(
-                    'USER_NOT_FOUND',
-                    HttpStatus.NOT_FOUND,
-                );
+                throw new HttpException('USER_NOT_FOUND', HttpStatus.NOT_FOUND,);
             } else {
                 return await this.userModel.findOneAndUpdate({ _id: userId }, updateUserDto, { new: true }).exec();
             }

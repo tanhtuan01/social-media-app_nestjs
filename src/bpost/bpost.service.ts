@@ -5,13 +5,17 @@ import { Model } from 'mongoose';
 import { BPostDTO } from './bpost.dto';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.schema';
+import { Comment } from 'src/comment/comment.schema';
+import { Like } from 'src/like/like.schema';
+import { Mode } from 'fs';
 
 @Injectable()
 export class BpostService {
 
     constructor(@InjectModel(BPost.name) private readonly bpostModel: Model<BPost>,
-        @InjectModel(User.name) private readonly userModel: Model<User>
-    ) { }
+        @InjectModel(User.name) private readonly userModel: Model<User>,
+        @InjectModel(Comment.name) private readonly commentModel: Model<Comment>,
+        @InjectModel(Like.name) private readonly likeModel: Model<Like>) { }
 
     async findAllPostNotherUser(user_id: string): Promise<BPost[]> {
         try {
@@ -32,13 +36,34 @@ export class BpostService {
     //     }
     // }
 
-    async getAllPost(): Promise<(BPost & { name: string })[]> {
+    async getAllPost(userid: string): Promise<(BPost & { name: string })[]> {
         try {
-            const posts = await this.bpostModel.find().lean().exec();
+            const currentUser = await this.userModel.findOne({ _id: userid }).lean().exec();
+            const posts = await this.bpostModel.find().lean().sort({ createdAt: -1 }).exec();
+
             const postsWithUserName = await Promise.all(
                 posts.map(async (post) => {
                     const user = await this.userModel.findOne({ _id: post.author }).lean().exec();
-                    return { ...post, name: user.name || 'Unknown' };
+                    const comments = await this.commentModel.find({ postId: post._id }).lean().sort({ createdAt: -1 })
+                    const commentsWithUserName = await Promise.all(
+                        comments.map(async (comment) => {
+                            const commentUser = await this.userModel.findOne({ _id: comment.userId }).lean().exec();
+                            const userFIND = await this.userModel.findOne({ _id: comment.userId }).lean().exec();
+                            const meOrOther = userFIND.name == currentUser.name ? 'Me' : user.name;
+
+                            return {
+                                userName: meOrOther,
+                                content: comment.content,
+                                createdAt: comment.createdAt
+                            };
+                        })
+                    );
+                    const totalLike = await this.likeModel.countDocuments({ postId: post._id, isLiked: true }).exec();
+                    let name = user.name || 'Unknown';
+                    if (post.author == userid) {
+                        name = 'Me'
+                    }
+                    return { ...post, name, comment: commentsWithUserName, totalLike };
                 })
             );
             return postsWithUserName;
@@ -46,6 +71,33 @@ export class BpostService {
             throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // async getAllPostTEMP(): Promise<(BPost & { name: string; comments: { userId: string; userName: string; content: string; createdAt: Date }[] })[]> {
+    //     try {
+    //         const posts = await this.bpostModel.find().lean().sort({ createdAt: -1 }).exec();
+    //         const postsWithUserNameAndComments = await Promise.all(
+    //             posts.map(async (post) => {
+    //                 const user = await this.userModel.findOne({ _id: post.author }).lean().exec();
+    //                 const comments = await this.commentModel.find({ postId: post._id });
+    //                 const commentsWithUserName = await Promise.all(
+    //                     comments.map(async (comment) => {
+    //                         const commentUser = await this.userModel.findOne({ _id: comment.userId }).lean().exec();
+    //                         return {
+    //                             userId: comment.userId,
+    //                             userName: commentUser?.name || 'Unknown',
+    //                             content: comment.content,
+    //                             createdAt: comment.createdAt
+    //                         };
+    //                     })
+    //                 );
+    //                 return { ...post, name: user?.name || 'Unknown', comments: commentsWithUserName };
+    //             })
+    //         );
+    //         return postsWithUserNameAndComments;
+    //     } catch (error) {
+    //         throw new HttpException('INTERNAL_SERVER_ERROR', HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    // }
 
 
 

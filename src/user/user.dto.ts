@@ -1,5 +1,6 @@
 export class UserDTO {
 
+
     name: string;
 
     emailOrPhone: string;

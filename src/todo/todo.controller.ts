@@ -16,6 +16,12 @@ export class TodoController {
         return this.todoService.createTodo(userId, todoDTO);
     }
 
+    @Get('get/:id')
+    getTodoByUser(@Param('id') id: string, @Req() req: Request): Promise<ToDo> {
+        const userId = req.userId;
+        return this.todoService.getTodoByUser(id, userId);
+    }
+
     @Get('list-by-user')
     listTodoByUserId(@Req() req: Request): Promise<ToDo[]> {
         const userId = req.userId;
@@ -29,9 +35,9 @@ export class TodoController {
     }
 
     @Put('update/:id')
-    updateTodo(@Body() todoDTO: ToDoDTO, @Param('id') id: string): Promise<ToDo> {
-        todoDTO.userId = id
-        return this.todoService.updateTodo(todoDTO);
+    updateTodo(@Body() todoDTO: ToDoDTO, @Param('id') id: string, @Req() req: Request): Promise<ToDo> {
+        const userId = req.userId;
+        return this.todoService.updateTodo(id, todoDTO, userId);
     }
 
     @Get('todo/:id/:userId')

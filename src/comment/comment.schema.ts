@@ -18,7 +18,6 @@ export class Comment {
     @Prop({ default: Date.now })
     createdAt: Date;
 
-
 }
 
 

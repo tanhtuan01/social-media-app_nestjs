@@ -6,11 +6,13 @@ import { CommentDTO } from './comment.dto';
 
 @Injectable()
 export class CommentService {
+
     constructor(@InjectModel(Comment.name) private readonly commentModel: Model<Comment>) { }
 
-    async createComment(commentDTO: CommentDTO): Promise<Comment> {
+    async createComment(userid: string, commentDTO: CommentDTO): Promise<Comment> {
         try {
-            const comment = this.commentModel.create(commentDTO);
+            commentDTO.userId = userid;
+            const comment = await this.commentModel.create(commentDTO);
             if (!comment) throw new HttpException('Failed to create comment', HttpStatus.INTERNAL_SERVER_ERROR);
             return comment;
         } catch (error) {

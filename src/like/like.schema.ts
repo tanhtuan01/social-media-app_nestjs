@@ -15,6 +15,9 @@ export class Like {
     @Prop({ default: Date.now })
     createdAt: Date;
 
+    @Prop()
+    isLiked: boolean;
+
 }
 
 export const LikeSchema = SchemaFactory.createForClass(Like);

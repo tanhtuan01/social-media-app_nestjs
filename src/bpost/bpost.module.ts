@@ -5,11 +5,15 @@ import { BPost, BPostSchema } from './bpost.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from 'src/user/user.module';
 import { User, UserSchema } from 'src/user/user.schema';
+import { Comment, CommentSchema } from 'src/comment/comment.schema';
+import { Like, LikeSchema } from 'src/like/like.schema';
 
 @Module({
   imports: [MongooseModule.forFeature([
     { name: BPost.name, schema: BPostSchema },
-    { name: User.name, schema: UserSchema }
+    { name: User.name, schema: UserSchema },
+    { name: Comment.name, schema: CommentSchema },
+    { name: Like.name, schema: LikeSchema },
   ]), UserModule],
   controllers: [BpostController],
   providers: [BpostService],

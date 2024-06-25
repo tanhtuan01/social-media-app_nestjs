@@ -16,8 +16,9 @@ export class BpostController {
     }
 
     @Get('list')
-    async getAllPost(): Promise<BPost[]> {
-        return await this.bpostService.getAllPost();
+    async getAllPost(@Req() req: Request): Promise<BPost[]> {
+        const userId = req.userId;
+        return await this.bpostService.getAllPost(userId);
     }
 
     @Put('update/:post_id')
